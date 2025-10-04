@@ -1,0 +1,11 @@
+{
+  "name": "basic-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "basic-backend": "./bin/index.js"
+  },
+  "dependencies": {
+    "inquirer": "^9.3.8"
+  }
+}
