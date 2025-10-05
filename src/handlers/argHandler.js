@@ -25,7 +25,16 @@ function parseArgs() {
     console.log(`✅ Using DB template: ${db}`);
   }
 
-  const templatePath = getTemplatePath(templateName, db);
+  // --- Optional Swagger ---
+  const swagger = args.includes("--swagger");
+  let swaggerChoice = false;
+  if (swagger) {
+    swaggerChoice = true;
+    console.log(`✅ Swagger integration enabled`);
+  }
+
+  // --- Template Path ---
+  const templatePath = getTemplatePath(templateName, db, swagger);
   console.log(`✅ Template path resolved: ${templatePath}`);
 
   console.log(`✅ Arguments handled`);
@@ -35,6 +44,7 @@ function parseArgs() {
     templatePath,
     database: db,
     language: templateName,
+    swagger: swaggerChoice,
   };
 }
 

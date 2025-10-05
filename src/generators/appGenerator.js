@@ -1,18 +1,26 @@
 import fs from "fs";
 import path from "path";
 
-const appCode = `import express from 'express';
+const appCode = (swagger) => `import express from 'express';
 import userRoutes from './routes/userRoutes.js';
+${
+  swagger
+    ? "import swaggerUi from 'swagger-ui-express';\nimport options from './swagger/swaggerSpec.js';\nimport swaggerJsdoc from 'swagger-jsdoc';"
+    : ""
+}
 
 const app = express();
 
 app.use(express.json());
-app.use('/api/users', userRoutes);
+app.use('/api', userRoutes);
+${
+  swagger
+    ? "\nconst specs = swaggerJsdoc(options);\napp.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs))"
+    : ""
+}
 
 app.use((req, res, next) => {
-    const error = new Error('Not Found');
-    error.status = 404;
-    next(error);
+    res.status(404).json({ message: 'Page Not Found' });
 });
 
 app.use((err, req, res, next) => {
@@ -23,11 +31,11 @@ app.use((err, req, res, next) => {
 export default app;
 `;
 
-const appGenerator = (language, projectPath) => {
+const appGenerator = (typescript, projectPath, swagger) => {
   const srcPath = path.join(projectPath, "src");
   fs.writeFileSync(
-    path.join(srcPath, language === "typescript" ? "app.ts" : "app.js"),
-    appCode
+    path.join(srcPath, typescript ? "app.ts" : "app.js"),
+    appCode(swagger)
   );
 };
 
