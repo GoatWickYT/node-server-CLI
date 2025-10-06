@@ -28,12 +28,13 @@ ${typescript ? "\nimport { Request, Response } from 'express';" : ""}
  */
 const getAllUsers = (${
   typescript ? "req: Request, res: Response" : "req, res"
-})${typescript ? ":Response" : ""} => {
+}) => {
     try{
         const users = userModel.getAllUsers();
         res.status(200).json(users);
     }catch(error){
-        res.status(500).json({message: 'Error retrieving users', error: error.message});
+        if (error instanceof Error) return res.status(500).json({message: 'Error retrieving users', error: error.message});
+        res.status(500).json({message:'Error', error:'Unknown error'});
         // these should be logged to a file in a real-world application and handled globally with middleware
     }
 }
@@ -48,7 +49,7 @@ const getAllUsers = (${
 */
 const getUserById = (${
   typescript ? "req: Request, res: Response" : "req, res"
-})${typescript ? ":Response" : ""} => {
+}) => {
     try{
         const id ${typescript ? ":number" : ""}= ${
   typescript ? "Number" : "parseInt"
@@ -57,7 +58,8 @@ const getUserById = (${
         if(!user) return res.status(404).json({message: 'User not found'});
         res.status(200).json(user);
     }catch(error){
-        res.status(500).json({message: 'Error retrieving users', error: error.message});
+        if (error instanceof Error) return res.status(500).json({message: 'Error retrieving users', error: error.message});
+        res.status(500).json({message:'Error retrieving users', error:'Unknown error'});
         // these should be logged to a file in a real-world application and handled globally with middleware
     }
 }
@@ -71,12 +73,14 @@ const getUserById = (${
  */
 const createUser = (${
   typescript ? "req: Request, res: Response" : "req, res"
-})${typescript ? ":Response" : ""} => {
+}) => {
     try{
-        userModel.createUser(req.body);
+        const { name, email, password } = req.body;
+        userModel.createUser(name, email, password);
         res.status(201).json({ message: 'User created' });
     }catch(error){
-        res.status(500).json({message: 'Error retrieving users', error: error.message});
+        if (error instanceof Error) return res.status(500).json({message: 'Error retrieving users', error: error.message});
+        res.status(500).json({message:'Error retrieving users', error:'Unknown error'});
         // these should be logged to a file in a real-world application and handled globally with middleware
     }
 }
@@ -89,18 +93,20 @@ const createUser = (${
  */
 const updateUser = (${
   typescript ? "req: Request, res: Response" : "req, res"
-})${typescript ? ":Response" : ""} => {
+}) => {
     try{
         const id ${typescript ? ":number" : ""}= ${
   typescript ? "Number" : "parseInt"
 }(req.params.id);
+        const { name, email, password } = req.body;
         const result ${
           typescript ? ":boolean" : ""
-        }= userModel.updateUser(id, req.body);
+        }= userModel.updateUser(id, name, email, password);
         if(!result) return res.status(404).json({message: 'User not found'});
         res.status(200).json({ message: \`User with ID: \${id} updated\` });
     }catch(error){
-        res.status(500).json({message: 'Error retrieving users', error: error.message});
+        if (error instanceof Error) return res.status(500).json({message: 'Error updating user', error: error.message});
+        res.status(500).json({message:'Error updating user', error:'Unknown error'});
         // these should be logged to a file in a real-world application and handled globally with middleware
     }
 }
@@ -113,7 +119,7 @@ const updateUser = (${
  */
 const deleteUser = (${
   typescript ? "req: Request, res: Response" : "req, res"
-})${typescript ? ":Response" : ""} => {
+}) => {
     try{
         const id ${typescript ? ":number" : ""}= ${
   typescript ? "Number" : "parseInt"
@@ -122,7 +128,8 @@ const deleteUser = (${
         if(!result) return res.status(404).json({message: 'User not found'});
         res.json({ message: \`User with ID: \${id} deleted\` });
     }catch(error){
-        res.status(500).json({message: 'Error retrieving users', error: error.message});
+        if (error instanceof Error) return res.status(500).json({message: 'Error deleting User', error: error.message});
+        res.status(500).json({message:'Error deleting User', error:'Unknown error'});
         // these should be logged to a file in a real-world application and handled globally with middleware
     }
 }

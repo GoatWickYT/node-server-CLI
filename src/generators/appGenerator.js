@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
 
-const appCode = (swagger) => `import express from 'express';
+const appCode = (swagger, typescript) => `import express${
+  typescript ? ", { Request, Response }" : ""
+} from 'express';
 import userRoutes from './routes/userRoutes.js';
 ${
   swagger
@@ -19,11 +21,13 @@ ${
     : ""
 }
 
-app.use((req, res, next) => {
+app.use(${typescript ? "(req:Request, res:Response)" : "(req, res)"} => {
     res.status(404).json({ message: 'Page Not Found' });
 });
 
-app.use((err, req, res, next) => {
+app.use(${
+  typescript ? "(err: Error, req:Request, res:Response)" : "(err, req, res)"
+} => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
@@ -35,7 +39,7 @@ const appGenerator = (typescript, projectPath, swagger) => {
   const srcPath = path.join(projectPath, "src");
   fs.writeFileSync(
     path.join(srcPath, typescript ? "app.ts" : "app.js"),
-    appCode(swagger)
+    appCode(swagger, typescript)
   );
 };
 

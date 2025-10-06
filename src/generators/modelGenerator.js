@@ -13,12 +13,11 @@ Use SQL syntax to interact with the SQLite database.
 SQLite documentation: https://www.sqlite.org/docs.html
 */
 
-import db from '../config/db.js';${
-  typescript ? "\nimport { RowDataPacket } from 'better-sqlite3';" : ""
-}
+import db from '../config/db.js';
 ${
   typescript
-    ? `interface User{
+    ? `
+    interface User{
     id? :number
     name :string
     email :string
@@ -33,7 +32,9 @@ ${
  */
 const getAllUsers = ()${typescript ? ":Array<User>" : ""} => {
   const query = db.prepare('SELECT * FROM users');
-  const users ${typescript ? ": RowDataPacket[]" : ""} = query.all();
+  const users ${typescript ? ": User[]" : ""} = query.all()${
+  typescript ? " as User[]" : ""
+};
   return users;
 };
   
@@ -41,14 +42,18 @@ const getAllUsers = ()${typescript ? ":Array<User>" : ""} => {
  * Retrieves a user by their unique identifier.
  *
  * @param {number|string} id - The unique identifier of the user.
- * @returns {Object|null} The user object if found, otherwise null.
+ * @returns {${
+   typescript ? "User" : "Object"
+ }|null} The user object if found, otherwise null.
  */
 const getUserById = (id ${typescript ? ": number" : ""}) ${
   typescript ? ":User | null" : ""
 }=> {
   const query = db.prepare('SELECT * FROM users WHERE id = ?');
-  const user ${typescript ? ": RowDataPacket" : ""} = query.get(id);
-  return user;
+  const user ${typescript ? ": User" : ""} = query.get(id)${
+  typescript ? " as User" : ""
+};
+  return user${typescript ? "|| null" : ""};
 };
   
 /**
@@ -64,9 +69,11 @@ const createUser = (name ${typescript ? ": string" : ""}, email ${
 }, password ${typescript ? ": string" : ""})${typescript ? ":number" : ""} => {
   const query = db.prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?)');
   const info ${
-    typescript ? ": { lastInsertRowid: number }" : ""
+    typescript ? ": { lastInsertRowid: number | bigint }" : ""
   } = query.run(name, email, password);
-  return info.lastInsertRowid;
+  return ${
+    typescript ? "Number(info.lastInsertRowid)" : "info.lastInsertRowid"
+  };
 };
   
 /**

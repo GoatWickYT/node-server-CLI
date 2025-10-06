@@ -7,6 +7,12 @@ import dbGenerator from "./dbGenerator.js";
 import folderGenerator from "./folderGenerator.js";
 import modelGenerator from "./modelGenerator.js";
 import controllerGenerator from "./controllerGenerator.js";
+import {
+  envConfigContent,
+  eslintConfigContent,
+  swaggerContent,
+  tsconfigContent,
+} from "./utilityGenerator.js";
 
 // --- Index File ---
 const indexCode =
@@ -18,66 +24,6 @@ const indexCode =
         console.log(\`Server is running on port \$http://localhost:\${PORT}\`);
         initDb();
     });`;
-
-// --- Env Config File ---
-const envCode = (language) =>
-  `import 'dotenv/config';` +
-  `\n\nconst requireEnv = (name${
-    language === "typescript" ? ": string" : ""
-  }) ${language === "typescript" ? ": string" : ""} => {
-        const value${
-          language === "typescript" ? ": string | undefined" : ""
-        } = process.env[name];
-        if (!value) {
-          throw new Error(\`Environment variable \${name} is required\`);
-        }
-        return value;
-      }` +
-  `\n\nconst config = {
-        dbHost: requireEnv('DB_HOST'),
-        dbUser: requireEnv('DB_USER'),
-        dbPassword: requireEnv('DB_PASSWORD'),
-        dbName: requireEnv('DB_NAME'),
-        port: parseInt(process.env.PORT || '3000'),
-      };
-  export default config;`;
-
-// --- Swagger File ---
-const swaggerFile = (typescript) => `
-const options = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'Basic User API',
-            version: '1.0.0',
-        },
-        components: {
-            schemas: {
-                User: {
-                    type: 'object',
-                    properties: {
-                        id: { type: 'number' },
-                        name: { type: 'string' },
-                        email: {type: 'string' },
-                        password: {type: 'string'}
-                    },
-                },
-                UserInput: {
-                    type: 'object',
-                    properties: {
-                        name: { type: 'string' },
-                        email: {type: 'string' },
-                        password: {type: 'string'}
-                    },
-                    required: ['name', 'email', 'password'],
-                }
-            }
-        }
-    },
-    apis: ['./src/routes/*.${typescript ? "ts" : "js"}'],
-};
-export default options
-`;
 
 // --- Project Generator ---
 const generateProject = async (templatePath, answers, database, swagger) => {
@@ -107,6 +53,20 @@ const generateProject = async (templatePath, answers, database, swagger) => {
   copyPackageJson(templatePath, projectPath, projectName);
   console.log(`✅ package.json created in ${projectPath}`);
 
+  // --- tsconfig for building typescript
+  if (answers.language === "typescript") {
+    fs.writeFileSync(path.join(projectPath, "tsconfig.json"), tsconfigContent);
+  }
+
+  // --- ESlint config .json ---
+  fs.writeFileSync(
+    path.join(
+      projectPath,
+      `eslint.config.${answers.language === "typescript" ? "ts" : "js"}`
+    ),
+    eslintConfigContent(answers.language === "typescript")
+  );
+
   // --- Index File ---
   fs.writeFileSync(
     path.join(
@@ -126,7 +86,7 @@ const generateProject = async (templatePath, answers, database, swagger) => {
       "config",
       answers.language === "typescript" ? "env.ts" : "env.js"
     ),
-    envCode(answers.language)
+    envConfigContent(answers.language === "typescript")
   );
   console.log(`✅ Created env config file`);
 
@@ -206,7 +166,7 @@ const generateProject = async (templatePath, answers, database, swagger) => {
         "swagger",
         answers.language === "typescript" ? "swaggerSpec.ts" : "swaggerSpec.js"
       ),
-      swaggerFile(answers.language === "typescript")
+      swaggerContent(answers.language === "typescript")
     );
     console.log("✅ Swagger Docs created");
   }
