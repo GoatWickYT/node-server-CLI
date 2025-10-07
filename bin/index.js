@@ -15,8 +15,8 @@ try {
   }
 
   console.log("🚀 Generating project...");
-  await generateProject(templatePath, answers, database, swagger);
-  console.log(`✅ Project created at ./${answers.projectName || "my-app"}`);
+  await generateProject(templatePath, answers);
+  console.log(`✅ Project created at ./${answers.projectName ?? "my-app"}`);
 } catch (err) {
   console.error("❌ Something went wrong:", err.message);
 }

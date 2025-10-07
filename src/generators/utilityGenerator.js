@@ -25,7 +25,7 @@ import { defineConfig } from "eslint/config";
 export default defineConfig([
   { files: ["**/*.{js,mjs,cjs${
     typescript ? ",ts,mts,cts" : ""
-  }}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.browser } },${
+  }}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.node } },${
   typescript ? "\ntseslint.configs.recommended," : ""
 }
 ]);
@@ -33,8 +33,10 @@ export default defineConfig([
 
 // --- Env Config File ---
 export const envConfigContent = (typescript) =>
-  `import 'dotenv/config';` +
-  `\n\nconst requireEnv = (name${typescript ? ": string" : ""}) ${
+  `/* eslint-env node */
+
+  import 'dotenv/config';
+  \nconst requireEnv = (name${typescript ? ": string" : ""}) ${
     typescript ? ": string" : ""
   } => {
         const value${
@@ -50,7 +52,7 @@ export const envConfigContent = (typescript) =>
         dbUser: requireEnv('DB_USER'),
         dbPassword: requireEnv('DB_PASSWORD'),
         dbName: requireEnv('DB_NAME'),
-        port: parseInt(process.env.PORT || '3000'),
+        port: parseInt(process.env.PORT ?? '3000'),
       };
   export default config;`;
 

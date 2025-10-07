@@ -15,21 +15,22 @@ import {
 } from "./utilityGenerator.js";
 
 // --- Index File ---
-const indexCode =
-  `import config from './config/env.js';` +
-  `\nimport app from './app.js';` +
-  `\nimport {initDb} from './config/db.js';` +
-  `\n\nconst PORT = config.port;` +
-  `\n\napp.listen(PORT, async () => {
+const indexCode = `import config from './config/env.js';
+  import app from './app.js';
+  import {initDb} from './config/db.js';
+  \nconst PORT = config.port;
+  \napp.listen(PORT, async () => {
         console.log(\`Server is running on port \$http://localhost:\${PORT}\`);
         initDb();
     });`;
 
 // --- Project Generator ---
-const generateProject = async (templatePath, answers, database, swagger) => {
+const generateProject = async (templatePath, answers) => {
   let projectName = answers.projectName;
   if (!projectName) projectName = "my-app";
   if (projectName === ".") projectName = "";
+  const database = answers.database;
+  const swagger = answers.swagger;
 
   projectName = projectName.replace(/\s+/g, "-").toLowerCase();
   const projectPath = path.join(process.cwd(), projectName);

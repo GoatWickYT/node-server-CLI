@@ -4,7 +4,7 @@ function parseArgs() {
   console.log(`⚙️  Handling arguments`);
   const args = process.argv.slice(2);
 
-  const projectName = args[0] || "my-app";
+  const projectName = args[0] ?? "my-app";
   const skipPrompts = args.some((arg) =>
     ["--skip-prompts", "--skip", "-y", "--template", "--db"].includes(arg)
   );

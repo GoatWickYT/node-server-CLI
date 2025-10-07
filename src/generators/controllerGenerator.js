@@ -100,7 +100,7 @@ const updateUser = (${
 }(req.params.id);
         const { name, email, password } = req.body;
         const result ${
-          typescript ? ":boolean" : ""
+          typescript ? ":Promise<boolean>" : ""
         }= userModel.updateUser(id, name, email, password);
         if(!result) return res.status(404).json({message: 'User not found'});
         res.status(200).json({ message: \`User with ID: \${id} updated\` });
@@ -124,7 +124,9 @@ const deleteUser = (${
         const id ${typescript ? ":number" : ""}= ${
   typescript ? "Number" : "parseInt"
 }(req.params.id);
-        const result ${typescript ? ":boolean" : ""}= userModel.deleteUser(id);
+        const result ${
+          typescript ? ":Promise<boolean>" : ""
+        }= userModel.deleteUser(id);
         if(!result) return res.status(404).json({message: 'User not found'});
         res.json({ message: \`User with ID: \${id} deleted\` });
     }catch(error){
