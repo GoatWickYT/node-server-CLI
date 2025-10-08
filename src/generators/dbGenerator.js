@@ -1,7 +1,5 @@
-const dbGenerator = (database, language) => {
-  console.log(
-    `⚙️  Generating database configuration for ${database} in ${language}`
-  );
+const dbGenerator = (database) => {
+  console.log(`⚙️  Generating database configuration for ${database}`);
   if (database === "postresql") return postgresql();
   if (database === "mysql") return mysql();
   if (database === "sqlite") return sqlite();
@@ -23,7 +21,8 @@ import config from "./env.js";
 const pool = mysql.createPool({
   host: config.dbHost,
   user: config.dbUser,
-  password: config.dbPassword,
+  database: config.dbName,
+  /*password: config.dbPassword,*/
   waitForConnections: true,
   connectionLimit: 10,
 });
@@ -32,7 +31,7 @@ export const initDb = async () => {
   try {
     await pool.query(\`
             CREATE TABLE IF NOT EXISTS users
-                (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                (id INT PRIMARY KEY AUTO_INCREMENT,
                 name VARCHAR(20) NOT NULL,
                 email VARCHAR(20) UNIQUE,
                 password VARCHAR(255) NOT NULL);

@@ -1,4 +1,4 @@
-const controllerGenerator = (typescript) => `/*
+const controllerGenerator = (typescript, database) => `/*
 [-----IMPORTANT INSTRUCTIONS-----]
 
 To add more controllers, define additional functions following the structure below.
@@ -100,7 +100,9 @@ const updateUser = (${
 }(req.params.id);
         const { name, email, password } = req.body;
         const result ${
-          typescript ? ":Promise<boolean>" : ""
+          typescript
+            ? `${database === "mysql" ? ":Promise<boolean>" : ":boolean"}`
+            : ""
         }= userModel.updateUser(id, name, email, password);
         if(!result) return res.status(404).json({message: 'User not found'});
         res.status(200).json({ message: \`User with ID: \${id} updated\` });
@@ -125,7 +127,9 @@ const deleteUser = (${
   typescript ? "Number" : "parseInt"
 }(req.params.id);
         const result ${
-          typescript ? ":Promise<boolean>" : ""
+          typescript
+            ? `${database === "mysql" ? ":Promise<boolean>" : ":boolean"}`
+            : ""
         }= userModel.deleteUser(id);
         if(!result) return res.status(404).json({message: 'User not found'});
         res.json({ message: \`User with ID: \${id} deleted\` });

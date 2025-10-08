@@ -15,7 +15,6 @@
   "description": "",
   "devDependencies": {
     "@types/swagger-ui-express": "^4.1.8",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/swagger-jsdoc": "^6.0.4",
     "typescript-eslint": "^8.45.0",
     "@types/express": "^5.0.3",
@@ -28,9 +27,9 @@
   },
   "dependencies": {
     "swagger-ui-express": "^5.0.1",
-    "better-sqlite3": "^12.4.1",
     "swagger-jsdoc": "^6.2.8",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "dotenv": "^17.2.3"
+    "mysql2": "^3.15.1"
   }
 }

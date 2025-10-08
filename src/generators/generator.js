@@ -20,17 +20,20 @@ const indexCode = `import config from './config/env.js';
   import {initDb} from './config/db.js';
   \nconst PORT = config.port;
   \napp.listen(PORT, async () => {
-        console.log(\`Server is running on port \$http://localhost:\${PORT}\`);
+        console.log(\`Server is running on port http://localhost:\${PORT}\`);
         initDb();
     });`;
 
 // --- Project Generator ---
-const generateProject = async (templatePath, answers) => {
-  let projectName = answers.projectName;
+const generateProject = async (
+  templatePath,
+  typescript,
+  database,
+  swagger,
+  projectName
+) => {
   if (!projectName) projectName = "my-app";
   if (projectName === ".") projectName = "";
-  const database = answers.database;
-  const swagger = answers.swagger;
 
   projectName = projectName.replace(/\s+/g, "-").toLowerCase();
   const projectPath = path.join(process.cwd(), projectName);
@@ -55,51 +58,34 @@ const generateProject = async (templatePath, answers) => {
   console.log(`✅ package.json created in ${projectPath}`);
 
   // --- tsconfig for building typescript
-  if (answers.language === "typescript") {
+  if (typescript) {
     fs.writeFileSync(path.join(projectPath, "tsconfig.json"), tsconfigContent);
   }
 
   // --- ESlint config .json ---
   fs.writeFileSync(
-    path.join(
-      projectPath,
-      `eslint.config.${answers.language === "typescript" ? "ts" : "js"}`
-    ),
-    eslintConfigContent(answers.language === "typescript")
+    path.join(projectPath, `eslint.config.${typescript ? "ts" : "js"}`),
+    eslintConfigContent(typescript)
   );
 
   // --- Index File ---
   fs.writeFileSync(
-    path.join(
-      projectPath,
-      "src",
-      answers.language === "typescript" ? "index.ts" : "index.js"
-    ),
+    path.join(projectPath, "src", typescript ? "index.ts" : "index.js"),
     indexCode
   );
   console.log(`✅ Created index file`);
 
   // --- Env Config File ---
   fs.writeFileSync(
-    path.join(
-      projectPath,
-      "src",
-      "config",
-      answers.language === "typescript" ? "env.ts" : "env.js"
-    ),
-    envConfigContent(answers.language === "typescript")
+    path.join(projectPath, "src", "config", typescript ? "env.ts" : "env.js"),
+    envConfigContent(typescript)
   );
   console.log(`✅ Created env config file`);
 
   // --- DB Config File ---
   fs.writeFileSync(
-    path.join(
-      projectPath,
-      "src",
-      "config",
-      answers.language === "typescript" ? "db.ts" : "db.js"
-    ),
-    dbGenerator(database, answers.language)
+    path.join(projectPath, "src", "config", typescript ? "db.ts" : "db.js"),
+    dbGenerator(database)
   );
   console.log(`✅ Created db config file`);
 
@@ -107,7 +93,7 @@ const generateProject = async (templatePath, answers) => {
   fs.writeFileSync(
     path.join(projectPath, ".env"),
     "DB_HOST=localhost" +
-      "\nDB_USER=your_db_user" +
+      "\nDB_USER=root" +
       "\nDB_PASSWORD=your_db_password" +
       "\nDB_NAME=your_db_name" +
       "\nDB_PORT=5432" +
@@ -116,7 +102,7 @@ const generateProject = async (templatePath, answers) => {
   console.log(`✅ Created .env file`);
 
   // --- App File ---
-  appGenerator(answers.language === "typescript", projectPath, swagger);
+  appGenerator(typescript, projectPath, swagger);
   console.log(`✅ Created app file`);
 
   // --- Sample Model File ---
@@ -125,9 +111,9 @@ const generateProject = async (templatePath, answers) => {
       projectPath,
       "src",
       "models",
-      answers.language === "typescript" ? "userModel.ts" : "userModel.js"
+      typescript ? "userModel.ts" : "userModel.js"
     ),
-    modelGenerator(answers.language === "typescript", database)
+    modelGenerator(typescript, database)
   );
   console.log(`✅ Created sample model file`);
 
@@ -137,11 +123,9 @@ const generateProject = async (templatePath, answers) => {
       projectPath,
       "src",
       "controllers",
-      answers.language === "typescript"
-        ? "usercontroller.ts"
-        : "usercontroller.js"
+      typescript ? "usercontroller.ts" : "usercontroller.js"
     ),
-    controllerGenerator(answers.language === "typescript", database)
+    controllerGenerator(typescript)
   );
   console.log(`✅ Created sample controller file`);
 
@@ -151,7 +135,7 @@ const generateProject = async (templatePath, answers) => {
       projectPath,
       "src",
       "routes",
-      answers.language === "typescript" ? "userRoutes.ts" : "userRoutes.js"
+      typescript ? "userRoutes.ts" : "userRoutes.js"
     ),
     routeGenerator(swagger)
   );
@@ -165,16 +149,16 @@ const generateProject = async (templatePath, answers) => {
         projectPath,
         "src",
         "swagger",
-        answers.language === "typescript" ? "swaggerSpec.ts" : "swaggerSpec.js"
+        typescript ? "swaggerSpec.ts" : "swaggerSpec.js"
       ),
-      swaggerContent(answers.language === "typescript")
+      swaggerContent(typescript)
     );
     console.log("✅ Swagger Docs created");
   }
 
   // --- Summary ---
   console.log(
-    `✅ Created ${answers.language} backend ${
+    `✅ Created ${typescript ? "typescript" : "javascript"} backend ${
       database ? `using ${database}` : ""
     } at ${projectPath}`
   );

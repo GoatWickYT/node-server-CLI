@@ -1,5 +1,3 @@
-import getTemplatePath from "../getTemplate.js";
-
 function parseArgs() {
   console.log(`⚙️  Handling arguments`);
   const args = process.argv.slice(2);
@@ -33,15 +31,10 @@ function parseArgs() {
     console.log(`✅ Swagger integration enabled`);
   }
 
-  // --- Template Path ---
-  const templatePath = getTemplatePath(templateName, db, swagger);
-  console.log(`✅ Template path resolved: ${templatePath}`);
-
   console.log(`✅ Arguments handled`);
   return {
     projectName,
     skipPrompts,
-    templatePath,
     database: db,
     language: templateName,
     swagger: swaggerChoice,

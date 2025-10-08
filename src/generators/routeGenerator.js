@@ -125,9 +125,9 @@ ${
 // Sample route
 router.get('/users', userController.getAllUsers);
 router.post('/users', userController.createUser);
-router.get('/api/users/:id', userController.getUserById);
-router.put('/api/users/:id', userController.updateUser);
-router.delete('/api/users/:id', userController.deleteUser);
+router.get('/users/:id', userController.getUserById);
+router.put('/users/:id', userController.updateUser);
+router.delete('/users/:id', userController.deleteUser);
 
 export default router;
 `;
